@@ -11,5 +11,5 @@ EXECUÇÃO:
 3. Insira a mensagem e a chave desejada.
 
 OBSERVAÇÕES:
-- Apenas letras são cifradas. (Espaços e pontuações são preservados)
+
 - A chave será automaticamente ajustada para o tamanho da mensagem.
