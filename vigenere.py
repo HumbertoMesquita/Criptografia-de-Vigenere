@@ -1,14 +1,18 @@
+import string
 import os
 
-# Função para limpar a tela do terminal após uma interação completa
+# Lista de caracteres suportados (letras, números, espaços)
+caracteres_validos = string.printable  # 100 caracteres (~do espaço até o ~)
+#0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ \t\n\r\x0b\x0c
+
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-# Função que gera uma chave do mesmo tamanho da mensagem
-# A chave original é repetida até igualar o tamanho da mensagem
-
 def gerar_chave(mensagem, chave):
+    
+    #Gera uma chave repetida com mesmo comprimento da mensagem.
+    
     chave = list(chave)
     if len(chave) == len(mensagem):
         return "".join(chave)
@@ -17,50 +21,47 @@ def gerar_chave(mensagem, chave):
             chave.append(chave[i % len(chave)])
     return "".join(chave)
 
-# Função de criptografia usando a cifra de Vigenère
-
 def criptografar(mensagem, chave):
-    mensagem = mensagem.upper()                # Converte a mensagem para letras maiúsculas
-    chave = gerar_chave(mensagem, chave.upper())  # Gera uma chave com mesmo tamanho
- 
-    # Para cada letra da mensagem e da chave:
+    
+    #Criptografa a mensagem usando a cifra de Vigenère.
+    
+    chave = gerar_chave(mensagem, chave)
+    resultado = ""
 
     for m, k in zip(mensagem, chave):
-        if m.isalpha():  # Criptografa apenas letras
-            # Soma os códigos das letras e aplica módulo 26
-            c = chr(((ord(m) + ord(k)) % 26) + ord('A'))
-            criptografada.append(c)
-
+        if m in caracteres_validos and k in caracteres_validos:
+            i_m = caracteres_validos.index(m)
+            i_k = caracteres_validos.index(k)
+            i_c = (i_m + i_k) % len(caracteres_validos)
+            resultado += caracteres_validos[i_c]
         else:
-            # Mantém espaços, números e pontuação
-            criptografada.append(m)
+            resultado += m  # Se não for válido, mantém o caractere original
 
-    return "".join(criptografada)
+    return resultado
 
-# Função de decriptografia da cifra de Vigenère
-def decriptografar(cifrada, chave):
-    cifrada = cifrada.upper()
-    chave = gerar_chave(cifrada, chave.upper())
-    original = []
+def decriptografar(mensagem_cifrada, chave):
+    
+    #Decriptografa a mensagem usando a cifra de Vigenère.
+    
+    chave = gerar_chave(mensagem_cifrada, chave)
+    resultado = ""
 
-    # Para cada letra da mensagem cifrada e da chave:
-    for c, k in zip(cifrada, chave):
-        if c.isalpha():  # Decriptografa apenas letras
-            # Subtrai os códigos das letras e aplica módulo 26
-            o = chr(((ord(c) - ord(k) + 26) % 26) + ord('A'))
-            original.append(o)
+    for c, k in zip(mensagem_cifrada, chave):
+        if c in caracteres_validos and k in caracteres_validos:
+            i_c = caracteres_validos.index(c)
+            i_k = caracteres_validos.index(k)
+            i_m = (i_c - i_k) % len(caracteres_validos)
+            resultado += caracteres_validos[i_m]
         else:
-            # Mantém espaços, números e pontuação
-            original.append(c)
+            resultado += c
 
-    return "".join(original)
+    return resultado
 
-# Função com menu interativo
 def menu():
     while True:
-        limpar_tela()  # Limpa a tela a cada nova execução do menu
+        limpar_tela()
         print("=" * 40)
-        print("       Cifra de Vigenère")
+        print("    Cifra de Vigenère")
         print("=" * 40)
         print("1. Criptografar mensagem")
         print("2. Decriptografar mensagem")
@@ -69,31 +70,26 @@ def menu():
         opcao = input("Escolha uma opção (1-3): ")
 
         if opcao == '1':
-            # Entrada da mensagem e chave para criptografar
-            mensagem = input("\n Digite a mensagem a ser criptografada: ")
-            chave = input("Digite a chave: ")
+            mensagem = input("\nDigite a mensagem que deseja criptografar:\n> ")
+            chave = input("Digite a chave:\n> ")
             resultado = criptografar(mensagem, chave)
             print("\n Mensagem criptografada:\n", resultado)
 
         elif opcao == '2':
-            # Entrada da mensagem cifrada e chave para decriptografar
-            mensagem = input("\n Digite a mensagem criptografada: ")
-            chave = input("Digite a chave usada na criptografia: ")
+            mensagem = input("\nDigite a mensagem criptografada:\n> ")
+            chave = input("Digite a chave usada na criptografia:\n> ")
             resultado = decriptografar(mensagem, chave)
-            print("\n Mensagem original:\n", resultado)
+            print("\n Mensagem decriptografada:\n", resultado)
 
         elif opcao == '3':
-            # Encerra o programa
-            print("\n Encerrando o programa !")
+            print("\nEncerrando o programa. Até logo!")
             break
 
         else:
-            # Mensagem de erro para opção inválida
             print("\n Opção inválida. Tente novamente.")
 
-        # Pausa antes de voltar ao menu
-        input("\n Pressione Enter para continuar...")
+        input("\nPressione Enter para continuar...")
 
-# Ponto de entrada do programa
+# Início do programa
 if __name__ == "__main__":
     menu()
